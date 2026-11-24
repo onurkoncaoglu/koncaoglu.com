@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Royal Regions — Can you beat my time?</title>
+<meta name="description" content="A friend challenged you to a Royal Regions crown puzzle. Can you beat their time?">
+<meta property="og:title" content="Royal Regions — Can you beat my time?">
+<meta property="og:description" content="One crown in every row, column and color region. Solve the same board faster than your friend.">
+<meta property="og:image" content="https://koncaoglu.com/royalregions/icon.png">
+<link rel="icon" href="../icon.png">
+<style>
+  :root { --text:#ECE8F7; --muted:#B9B2D3; --gold:#FFC93C; --gold2:#F29F05; }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; color:var(--text); background:linear-gradient(180deg,#3A1A8A,#2B1677 35%,#120A38 85%);
+         background-attachment:fixed; font:16px/1.6 -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  main { max-width:520px; margin:0 auto; padding:48px 20px 40px; text-align:center; }
+  img.icon { width:112px; height:112px; border-radius:26px; box-shadow:0 18px 50px rgba(230,73,128,.35), 0 6px 18px rgba(0,0,0,.45); }
+  h1 { margin:18px 0 8px; font-size:clamp(1.8rem, 6vw, 2.4rem); line-height:1.15;
+       background:linear-gradient(180deg,#FFE08A,var(--gold) 45%,var(--gold2)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .card { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16); border-radius:22px; padding:20px; margin:22px 0; }
+  .what { color:var(--muted); margin:0 0 6px; }
+  .time { font-size:2.6rem; font-weight:900; color:#fff; margin:0; letter-spacing:.5px; }
+  .btn { display:block; padding:15px 24px; margin:12px 0; border-radius:999px; font-weight:800; text-decoration:none; color:#1A0E4D;
+         background:linear-gradient(180deg,#FFE08A,var(--gold) 50%,var(--gold2)); box-shadow:0 10px 30px rgba(255,201,60,.3); }
+  .btn.glass { color:#fff; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.25); box-shadow:none; }
+  .rules { color:var(--muted); font-size:.95rem; }
+  footer { color:var(--muted); font-size:.85rem; margin-top:28px; }
+  footer a { color:var(--gold); }
+</style>
+</head>
+<body>
+<main>
+  <img class="icon" src="../icon.png" alt="Royal Regions">
+  <h1 id="title">Can you beat my time?</h1>
+  <div class="card">
+    <p class="what" id="what">Royal Regions</p>
+    <p class="time" id="time">👑</p>
+  </div>
+  <a class="btn" id="open" href="#">Open in the app</a>
+  <a class="btn glass" id="store" href="https://play.google.com/store/apps/details?id=com.royalregions.game&amp;utm_source=challenge&amp;utm_campaign=level">Get it on Google Play</a>
+  <p class="rules" id="rules">One crown in every row, column and color region. Crowns can't touch, not even diagonally.</p>
+  <footer><a href="../">Royal Regions</a> · <a href="../privacy-policy.html">Privacy</a></footer>
+</main>
+<script>
+(function () {
+  // Texts in the game's five languages; the page follows the browser language.
+  var T = {
+    en: { title: "Can you beat my time?", level: "Level", daily: "Daily puzzle #", open: "Open in the app", store: "Get it on Google Play",
+          rules: "One crown in every row, column and color region. Crowns can't touch, not even diagonally.", bad: "This challenge link looks broken." },
+    tr: { title: "Süremi geçebilir misin?", level: "Bölüm", daily: "Günün bulmacası #", open: "Uygulamada aç", store: "Google Play'den indir",
+          rules: "Her satır, sütun ve renk bölgesinde bir taç olmalı. Taçlar birbirine değemez, çapraz bile.", bad: "Bu meydan okuma linki bozuk görünüyor." },
+    es: { title: "¿Puedes superar mi tiempo?", level: "Nivel", daily: "Puzle diario n.º ", open: "Abrir en la app", store: "Descárgalo en Google Play",
+          rules: "Una corona en cada fila, columna y región de color. Las coronas no pueden tocarse, ni en diagonal.", bad: "Este enlace de reto parece roto." },
+    zh: { title: "你能超过我的时间吗？", level: "第 ", daily: "每日谜题 #", open: "在应用中打开", store: "在 Google Play 下载",
+          rules: "每一行、每一列和每个颜色区域都要放一顶王冠。王冠不能相邻，斜着也不行。", bad: "这个挑战链接似乎已损坏。" },
+    hi: { title: "क्या आप मेरा समय हरा सकते हैं?", level: "स्तर", daily: "दैनिक पहेली #", open: "ऐप में खोलें", store: "Google Play से पाएँ",
+          rules: "हर पंक्ति, स्तंभ और रंग क्षेत्र में एक मुकुट। मुकुट एक-दूसरे को छू नहीं सकते, तिरछे भी नहीं।", bad: "यह चुनौती लिंक टूटा हुआ लगता है।" }
+  };
+  var lang = (navigator.language || "en").slice(0, 2).toLowerCase();
+  var t = T[lang] || T.en;
+  document.documentElement.lang = T[lang] ? lang : "en";
+
+  var q = new URLSearchParams(location.search);
+  function num(name, max) { var v = q.get(name); return v && /^\d{1,7}$/.test(v) && +v > 0 && +v <= max ? +v : null; }
+  var level = num("l", 100000), daily = num("d", 100000), sec = num("t", 86400);
+  var kind = level ? "level" : "daily";
+
+  document.getElementById("title").textContent = t.title;
+  document.getElementById("rules").textContent = t.rules;
+  document.getElementById("open").textContent = t.open;
+  var store = document.getElementById("store");
+  store.textContent = t.store;
+  var play = "https://play.google.com/store/apps/details?id=com.royalregions.game&utm_source=challenge&utm_campaign=" + kind;
+  store.href = play;
+
+  if (!sec || (!level && !daily)) {
+    document.getElementById("what").textContent = t.bad;
+    document.getElementById("open").style.display = "none";
+    return;
+  }
+  var what = level ? (lang === "zh" ? t.level + level + " 关" : t.level + " " + level) : t.daily + daily;
+  document.getElementById("what").textContent = what;
+  var m = Math.floor(sec / 60), s = sec % 60;
+  document.getElementById("time").textContent = "⏱ " + m + ":" + (s < 10 ? "0" : "") + s;
+
+  var query = (level ? "l=" + level : "d=" + daily) + "&t=" + sec;
+  var open = document.getElementById("open");
+  if (/android/i.test(navigator.userAgent)) {
+    // Chrome on Android: open the app if installed, otherwise go to the store listing
+    open.href = "intent://c?" + query + "#Intent;scheme=royalregions;package=com.royalregions.game;S.browser_fallback_url=" +
+      encodeURIComponent(play) + ";end";
+  } else {
+    open.href = "royalregions://c?" + query;
+  }
+})();
+</script>
+</body>
+</html>

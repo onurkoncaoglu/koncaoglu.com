@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.royalregions.game",
+      "sha256_cert_fingerprints": [
+        "DC:38:30:8E:3D:CE:69:43:FB:D2:F4:40:AD:FA:5F:3A:04:94:40:69:B0:D1:AC:8C:BB:DC:B1:F4:C0:37:05:51"
+      ]
+    }
+  }
+]
