@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Nonoglobe — Can you beat my time?</title>
+<meta name="description" content="A friend challenged you to a Nonoglobe picture puzzle. Can you beat their time?">
+<meta property="og:title" content="Nonoglobe — Can you beat my time?">
+<meta property="og:description" content="Solve the number clues, reveal the picture. Solve the same puzzle faster than your friend.">
+<meta property="og:image" content="https://koncaoglu.com/nonoglobe/icon.png">
+<link rel="icon" href="../icon.png">
+<style>
+  :root { --text:#E8F1F6; --muted:#A9C0CC; --coral:#FF7A59; --coral2:#FFB38A; --ink:#0B2233; }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; color:var(--text); background:linear-gradient(180deg,#1A4660,#0F2C3F 40%,#07161F 90%);
+         background-attachment:fixed; font:16px/1.6 -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  main { max-width:520px; margin:0 auto; padding:48px 20px 40px; text-align:center; }
+  img.icon { width:112px; height:112px; border-radius:26px; box-shadow:0 18px 50px rgba(255,122,89,.3), 0 6px 18px rgba(0,0,0,.45); }
+  h1 { margin:18px 0 8px; font-size:clamp(1.8rem, 6vw, 2.4rem); line-height:1.15;
+       background:linear-gradient(180deg,var(--coral2),var(--coral)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .card { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16); border-radius:22px; padding:20px; margin:22px 0; }
+  .what { color:var(--muted); margin:0 0 6px; }
+  .time { font-size:2.6rem; font-weight:900; color:#fff; margin:0; letter-spacing:.5px; }
+  .btn { display:block; padding:15px 24px; margin:12px 0; border-radius:999px; font-weight:800; text-decoration:none; color:var(--ink);
+         background:linear-gradient(180deg,var(--coral2),var(--coral)); box-shadow:0 10px 30px rgba(255,122,89,.3); }
+  .btn.glass { color:#fff; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.25); box-shadow:none; }
+  .rules { color:var(--muted); font-size:.95rem; }
+  footer { color:var(--muted); font-size:.85rem; margin-top:28px; }
+  footer a { color:var(--coral); }
+</style>
+</head>
+<body>
+<main>
+  <img class="icon" src="../icon.png" alt="Nonoglobe">
+  <h1 id="title">Can you beat my time?</h1>
+  <div class="card">
+    <p class="what" id="what">Nonoglobe</p>
+    <p class="time" id="time">🧩</p>
+  </div>
+  <a class="btn" id="open" href="#">Open in the app</a>
+  <a class="btn glass" id="store" href="https://play.google.com/store/apps/details?id=com.nonoglobe&amp;utm_source=challenge&amp;utm_campaign=level">Get it on Google Play</a>
+  <p class="rules" id="rules">Fill the cells so every row and column matches its number clues, and a pixel picture appears.</p>
+  <footer><a href="../">Nonoglobe</a> · <a href="../privacy-policy.html">Privacy</a></footer>
+</main>
+<script>
+(function () {
+  // Texts in the game's five languages; the page follows the browser language.
+  var T = {
+    en: { title: "Can you beat my time?", level: function (a, p) { return "City " + a + " · Picture " + p; }, daily: "Daily puzzle #",
+          open: "Open in the app", store: "Get it on Google Play",
+          rules: "Fill the cells so every row and column matches its number clues, and a pixel picture appears.",
+          bad: "This challenge link looks broken." },
+    tr: { title: "Süremi geçebilir misin?", level: function (a, p) { return "Şehir " + a + " · Resim " + p; }, daily: "Günün bulmacası #",
+          open: "Uygulamada aç", store: "Google Play'den indir",
+          rules: "Hücreleri her satır ve sütun kendi sayı ipuçlarına uyacak şekilde doldur; ortaya bir piksel resim çıkar.",
+          bad: "Bu meydan okuma linki bozuk görünüyor." },
+    es: { title: "¿Puedes superar mi tiempo?", level: function (a, p) { return "Ciudad " + a + " · Dibujo " + p; }, daily: "Puzle diario n.º ",
+          open: "Abrir en la app", store: "Descárgalo en Google Play",
+          rules: "Rellena las casillas para que cada fila y columna cumpla sus pistas numéricas, y aparecerá un dibujo de píxeles.",
+          bad: "Este enlace de reto parece roto." },
+    zh: { title: "你能超过我的时间吗？", level: function (a, p) { return "第 " + a + " 座城市 · 第 " + p + " 幅"; }, daily: "每日谜题 #",
+          open: "在应用中打开", store: "在 Google Play 下载",
+          rules: "按照每行每列的数字线索涂满格子，一幅像素画就会出现。",
+          bad: "这个挑战链接似乎已损坏。" },
+    hi: { title: "क्या आप मेरा समय हरा सकते हैं?", level: function (a, p) { return "शहर " + a + " · तस्वीर " + p; }, daily: "दैनिक पहेली #",
+          open: "ऐप में खोलें", store: "Google Play से पाएँ",
+          rules: "खानों को ऐसे भरें कि हर पंक्ति और स्तंभ अपने नंबर संकेतों से मेल खाए, और एक पिक्सेल तस्वीर दिखेगी।",
+          bad: "यह चुनौती लिंक टूटा हुआ लगता है।" }
+  };
+  var lang = (navigator.language || "en").slice(0, 2).toLowerCase();
+  var t = T[lang] || T.en;
+  document.documentElement.lang = T[lang] ? lang : "en";
+
+  var q = new URLSearchParams(location.search);
+  function num(name, max) { var v = q.get(name); return v && /^\d{1,7}$/.test(v) && +v > 0 && +v <= max ? +v : null; }
+  // album pictures are album * 1000 + position (1001, 1002, ...); daily puzzles are numbered from 1
+  var level = num("l", 999999), daily = num("d", 100000), sec = num("t", 86400);
+  if (level && (level < 1000 || level % 1000 === 0)) level = null;
+  var kind = level ? "level" : "daily";
+
+  document.getElementById("title").textContent = t.title;
+  document.getElementById("rules").textContent = t.rules;
+  document.getElementById("open").textContent = t.open;
+  var store = document.getElementById("store");
+  store.textContent = t.store;
+  var play = "https://play.google.com/store/apps/details?id=com.nonoglobe&utm_source=challenge&utm_campaign=" + kind;
+  store.href = play;
+
+  if (!sec || (!level && !daily)) {
+    document.getElementById("what").textContent = t.bad;
+    document.getElementById("open").style.display = "none";
+    return;
+  }
+  var what = level ? t.level(Math.floor(level / 1000), level % 1000) : t.daily + daily;
+  document.getElementById("what").textContent = what;
+  var m = Math.floor(sec / 60), s = sec % 60;
+  document.getElementById("time").textContent = "⏱ " + m + ":" + (s < 10 ? "0" : "") + s;
+
+  var query = (level ? "l=" + level : "d=" + daily) + "&t=" + sec;
+  var open = document.getElementById("open");
+  if (/android/i.test(navigator.userAgent)) {
+    // Chrome on Android: open the app if installed, otherwise go to the store listing
+    open.href = "intent://c?" + query + "#Intent;scheme=nonoglobe;package=com.nonoglobe;S.browser_fallback_url=" +
+      encodeURIComponent(play) + ";end";
+  } else {
+    open.href = "nonoglobe://c?" + query;
+  }
+})();
+</script>
+</body>
+</html>
